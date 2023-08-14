@@ -390,7 +390,7 @@ int p11() {
     }
 }
 
-int p40()
+int p12()
 {
 	// https://github.com/kevlu8/Xytharis/issues/6 #1
 	whiletrue
