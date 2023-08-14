@@ -12,19 +12,24 @@
 ![sub2kevlu8](https://img.shields.io/youtube/channel/subscribers/UCFlq5_Vc25IBwus8euGTVNA?style=social)
 ![keybase](https://img.shields.io/keybase/pgp/kevlu8)
 ![commits](https://img.shields.io/github/commit-activity/m/kevlu8/Xytharis)
+#####
+Now, it's supported, working.
+Before, it's from kevlu8, but he was closed that repository, then i will modify the code, for better result and match the comments in the code.
+#####
 
 ### Unfinished
 This is not finished!!
 
 ### The GDI Trojan
 
-Hey there, I'm kevlu8, and I like coding! This is my first C++ program, and I'm still learning as I'm typing this!
+~~Hey there, I'm kevlu8, and I like coding! This is my first C++ program, and I'm still learning as I'm typing this!
 I went from knowing nothing about C++ to being able to do decent stuff in it in just about a month.
 I apologize for the crappy payloads of this trojan: after all, I'm still trying to learn.
 Credit goes to [this Discord server](https://www.discord.gg/zw) for helping me out on a lot of this!
+~~
+fun fact: this is also a school project lmao~~
 
-fun fact: this is also a school project lmao
-
+I will improve it based in the issues. 
 ## Contributing
 If your eyes are burned out by my code, feel free to create a pull request or dm me (kevlu8#5240) on Discord asking to be added as a contributer.
 
