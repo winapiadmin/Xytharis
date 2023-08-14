@@ -191,31 +191,84 @@ int p7()  //MUST DO IN THREAD
     return 0;
 }
 
+
 // Color shift the screen using BitBlt
-int p8() 
+int p28() 
 {
-    fori(50)
-    {
-        Sleep(rand() % 10000);
-        HDC hdc = GetDC(NULL);
-        HBITMAP hBitmap = CreateCompatibleBitmap(hdc, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-        HDC hdcMem = CreateCompatibleDC(hdc);
-        SelectObject(hdcMem, hBitmap);
-        BitBlt(hdcMem, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdc, 0, 0, SRCCOPY);
-        fori(GetSystemMetrics(SM_CXSCREEN))
-        {
-            for (int j = 0; j < SM_CYSCREEN; j++)
-            {
-                COLORREF color = GetPixel(hdcMem, i, j);
-                SetPixel(hdcMem, i, j, RGB(GetRValue(color) + rand() % 0xFF, GetGValue(color) + rand() % 0xFF, GetBValue(color) + rand() % 0xFF));
-            }
-        }
-        BitBlt(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdcMem, 0, 0, SRCCOPY);
-        DeleteDC(hdcMem);
-        DeleteObject(hBitmap);
-        ReleaseDC(NULL, hdc);
-    }
-    return 0;
+	fori(50)
+	{
+		// No longer avaliable.
+		// https://github.com/kevlu8/Xytharis/issues/9
+		/*
+		Sleep(rand() % 10000);
+		HDC hdc = GetDC(NULL);
+		HBITMAP hBitmap = CreateCompatibleBitmap(hdc, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+		HDC hdcMem = CreateCompatibleDC(hdc);
+		SelectObject(hdcMem, hBitmap);
+		BitBlt(hdcMem, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdc, 0, 0, SRCCOPY);
+		fori(GetSystemMetrics(SM_CXSCREEN))
+		{
+			for (int j = 0; j < SM_CYSCREEN; j++)
+			{
+				COLORREF color = GetPixel(hdcMem, i, j);
+				SetPixel(hdcMem, i, j, RGB(GetRValue(color) + rand() % 0xFF, GetGValue(color) + rand() % 0xFF, GetBValue(color) + rand() % 0xFF));
+			}
+		}
+		BitBlt(hdc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), hdcMem, 0, 0, SRCCOPY);
+		DeleteDC(hdcMem);
+		DeleteObject(hBitmap);
+		ReleaseDC(NULL, hdc);
+  		*/
+		// Try this instead
+		// Taken from GDIExamples/Threshold and https://github.com/kevlu8/Xytharis/issues/9
+		HDC hdc = GetDC(NULL);
+		HBITMAP hBitmap = CreateBitmap(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 1, 24, NULL);
+		BITMAP bitmap;
+		GetObject(hBitmap, sizeof(bitmap), &bitmap);
+	
+		BITMAPINFO bmi;
+		ZeroMemory(&bmi, sizeof(BITMAPINFO));
+		bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth = bitmap.bmWidth;
+		bmi.bmiHeader.biHeight = bitmap.bmHeight;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 24;
+	
+		BYTE* pBits;
+		HBITMAP hBitmapCopy = CreateDIBSection(hdc, &bmi, DIB_RGB_COLORS, (void**)&pBits, NULL, 0);
+	
+		HDC hdcMem = CreateCompatibleDC(hdc);
+		HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcMem, hBitmapCopy);
+		BitBlt(hdcMem, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, 0, 0, SRCCOPY);
+		int value = 127;
+		for (int y = 0; y < bitmap.bmHeight; y++)
+		{
+		    BYTE* pPixelRow = pBits + y * bitmap.bmWidth * 3;
+	
+		    for (int x = 0; x < bitmap.bmWidth; x++)
+		    {
+			BYTE* pPixel = pPixelRow + x * 3;
+	
+			int r = pPixel[2];
+			int g = pPixel[1];
+			int b = pPixel[0];
+			
+			pPixel[2]<<=4;
+			pPixel[1]<<=4;
+			pPixel[0]<<=4;
+		    }
+		    BitBlt(hdc, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdcMem, 0, 0, SRCCOPY);
+	        }
+		BitBlt(hdc, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdcMem, 0, 0, SRCCOPY);
+		//Sleep(1000);
+		SelectObject(hdcMem, hBitmapOld);
+		DeleteDC(hdcMem);
+		DeleteObject(hBitmapCopy);
+	
+		ReleaseDC(NULL, hdc);
+		DeleteObject(hBitmap);
+	}
+	return 0;
 }
 
 // Connect a virtual USB device
@@ -260,51 +313,55 @@ int p11() {
 
 
         int randEffectNum = rand() % 13;
-        // int randEffectNum = 1;
-        if (randEffectNum == 1) {
-            randEffect = CAPTUREBLT;
-        }
-        else if (randEffectNum == 2) {
-            randEffect = DSTINVERT;
-        }
-        else if (randEffectNum == 3) {
-            randEffect = MERGECOPY;
-        }
-        else if (randEffectNum == 4) {
-            randEffect = MERGEPAINT;
-        }
-        else if (randEffectNum == 5) {
-            randEffect = NOTSRCCOPY;
-        }
-        else if (randEffectNum == 6) {
-            randEffect = MERGECOPY;
-        }
-        else if (randEffectNum == 7) {
-            randEffect = NOTSRCERASE;
-        }
-        else if (randEffectNum == 8) {
-            randEffect = PATCOPY;
-        }
-        else if (randEffectNum == 9) {
-            randEffect = PATINVERT;
-        }
-        else if (randEffectNum == 10) {
-            randEffect = PATPAINT;
-        }
-        else if (randEffectNum == 11) {
-            randEffect = SRCAND;
-        }
-        else if (randEffectNum == 12) {
-            randEffect = SRCERASE;
-        }
-        else if (randEffectNum == 13) {
-            randEffect = SRCINVERT;
-        }
-        else if (randEffectNum == 0) {
-            randEffect = SRCPAINT;
-        }
-        else {
-        }
+		// Should keep, but one line different.
+		// int randEffectNum = 1;
+		switch (randEffectNum)
+			case 1:
+				randEffect = CAPTUREBLT;
+				break;
+			case 2:
+				randEffect = DSTINVERT;
+				break;
+			case 3:
+				randEffect = MERGECOPY;
+				break;
+			case 4:
+				randEffect = MERGEPAINT;
+				break;
+			case 5:
+				randEffect = NOTSRCCOPY;
+				break;
+			case 6:
+				randEffect = MERGECOPY;
+				break;
+			case 7:
+				randEffect = NOTSRCERASE;
+				break;
+			case 8:
+				randEffect = PATCOPY;
+				break;
+			case 9:
+				randEffect = PATINVERT;
+				break;
+			case 10:
+				randEffect = PATPAINT;
+				break;
+			case 11:
+				randEffect = SRCAND;
+				break;
+			case 12:
+				randEffect = SRCERASE;
+				break;
+			case 13:
+				randEffect = SRCINVERT;
+				break;
+			case 0:
+				randEffect = SRCPAINT;
+				break;
+			default:
+				//cout << "death";
+				break;
+		}
         BitBlt(desk, 10, 450, 50, 250, desk, 10, y1, randEffect);
         BitBlt(desk, 10, 700, 300, 50, desk, 10, y1, randEffect);
         BitBlt(desk, 260, 450, 50, 250, desk, 260, y1, randEffect);
