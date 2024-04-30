@@ -240,7 +240,6 @@ int p28()
 		HDC hdcMem = CreateCompatibleDC(hdc);
 		HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcMem, hBitmapCopy);
 		BitBlt(hdcMem, 0, 0, bitmap.bmWidth, bitmap.bmHeight, hdc, 0, 0, SRCCOPY);
-		int value = 127;
 		for (int y = 0; y < bitmap.bmHeight; y++)
 		{
 		    BYTE* pPixelRow = pBits + y * bitmap.bmWidth * 3;
